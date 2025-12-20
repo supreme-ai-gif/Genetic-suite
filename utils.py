@@ -1,28 +1,14 @@
 def ai_generate(tool, text):
-    text = text.strip()
-
-    if not text:
+    if not text.strip():
         return "Please enter some text."
 
-    if tool == "writer":
-        return (
-            "📝 Generated Essay:\n\n"
-            + text
-            + "\n\n(This is a sample AI-written response.)"
-        )
+    if tool == 'writer':
+        return f"📝 Generated Essay:\n\n{text}\n\n(Professional AI output)"
 
-    elif tool == "rewriter":
-        return (
-            "🔁 Rewritten Version:\n\n"
-            + text.replace(" very ", " extremely ")
-            .replace(" good ", " excellent ")
-            .replace(" bad ", " poor ")
-        )
+    if tool == 'rewriter':
+        return "🔁 Rewritten Text:\n\n" + text.replace(" very ", " extremely ")
 
-    elif tool == "summarizer":
-        return (
-            "📌 Summary:\n\n"
-            + (text[:150] + "..." if len(text) > 150 else text)
-        )
+    if tool == 'summarizer':
+        return "📌 Summary:\n\n" + (text[:150] + '...' if len(text) > 150 else text)
 
-    return "Unknown tool selected."
+    return "Unknown tool"
