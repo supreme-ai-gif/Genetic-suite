@@ -6,10 +6,10 @@ from utils import ai_generate
 
 app = Flask(__name__)
 
-app.secret_key = os.environ.get("SECRET_KEY", "genetic_dev_key_123")
+app.secret_key = os.environ.get("SECRET_KEY") or "genetic_super_secret"
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/genetic.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/genetic.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
@@ -21,58 +21,52 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == "POST":
-        username = request.form["username"]
-        password = generate_password_hash(request.form["password"])
-
+    if request.method == 'POST':
+        username = request.form['username']
+        password = generate_password_hash(request.form['password'])
         if User.query.filter_by(username=username).first():
-            return "User already exists"
-
+            return "Username already exists"
         db.session.add(User(username=username, password=password))
         db.session.commit()
-        return redirect(url_for("login"))
+        return redirect(url_for('login'))
+    return render_template('register.html')
 
-    return render_template("register.html")
-
-@app.route("/login", methods=["GET", "POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == "POST":
-        user = User.query.filter_by(username=request.form["username"]).first()
-        if user and check_password_hash(user.password, request.form["password"]):
-            session["user"] = user.id
-            return redirect(url_for("dashboard"))
+    if request.method == 'POST':
+        user = User.query.filter_by(username=request.form['username']).first()
+        if user and check_password_hash(user.password, request.form['password']):
+            session['user_id'] = user.id
+            return redirect(url_for('dashboard'))
         return "Invalid login"
+    return render_template('login.html')
 
-    return render_template("login.html")
-
-@app.route("/dashboard")
+@app.route('/dashboard')
 def dashboard():
-    if "user" not in session:
-        return redirect(url_for("login"))
-    return render_template("dashboard.html")
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template('dashboard.html')
 
-@app.route("/tool/<tool>", methods=["GET", "POST"])
-def tool(tool):
-    if "user" not in session:
-        return redirect(url_for("login"))
+@app.route('/tool/<name>', methods=['GET', 'POST'])
+def tool(name):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        text = request.form['text']
+        result = ai_generate(name, text)
+        return render_template('tool_result.html', name=name, result=result)
+    return render_template('tool.html', name=name)
 
-    if request.method == "POST":
-        text = request.form["text"]
-        result = ai_generate(tool, text)
-        return render_template("result.html", tool=tool, result=result)
-
-    return render_template("tool.html", tool=tool)
-
-@app.route("/logout")
+@app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for("index"))
+    return redirect(url_for('index'))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
