@@ -67,6 +67,17 @@ def tool(name):
 def logout():
     session.clear()
     return redirect(url_for('index'))
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
