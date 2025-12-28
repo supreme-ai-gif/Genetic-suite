@@ -1,8 +1,15 @@
 {% extends 'layout.html' %}
 {% block content %}
-<h2>{{ name|capitalize }}</h2>
+
+<div class="hero">
+  <h1>{{ name|capitalize }}</h1>
+  <p>Enter your text below</p>
+</div>
+
 <form method="post">
-<textarea name="text" rows="8"></textarea>
-<button>Generate</button>
+  <textarea name="text" placeholder="Type your text here..."></textarea>
+  <br>
+  <button>Generate</button>
 </form>
+
 {% endblock %}
