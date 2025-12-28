@@ -1,14 +1,30 @@
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
 def ai_generate(tool, text):
     if not text.strip():
         return "Please enter some text."
 
-    if tool == 'writer':
-        return f"📝 Generated Essay:\n\n{text}\n\n(Professional AI output)"
+    if tool == "writer":
+        prompt = f"Write a detailed essay about: {text}"
 
-    if tool == 'rewriter':
-        return "🔁 Rewritten Text:\n\n" + text.replace(" very ", " extremely ")
+    elif tool == "rewriter":
+        prompt = f"Rewrite the following text professionally:\n{text}"
 
-    if tool == 'summarizer':
-        return "📌 Summary:\n\n" + (text[:150] + '...' if len(text) > 150 else text)
+    elif tool == "summarizer":
+        prompt = f"Summarize the following text clearly:\n{text}"
 
-    return "Unknown tool"
+    else:
+        return "Unknown tool."
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful AI writing assistant."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return response.choices[0].message.content
