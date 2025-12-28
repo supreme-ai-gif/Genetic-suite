@@ -1,6 +1,15 @@
 {% extends 'layout.html' %}
 {% block content %}
-<h2>Result</h2>
-<pre>{{ result }}</pre>
-<a href="/dashboard">Back</a>
+
+<div class="hero">
+  <h1>AI Result</h1>
+</div>
+
+<div class="card">
+  <pre style="white-space:pre-wrap;font-size:16px">{{ result }}</pre>
+</div>
+
+<br>
+<a href="/dashboard" class="btn">Back to Dashboard</a>
+
 {% endblock %}
