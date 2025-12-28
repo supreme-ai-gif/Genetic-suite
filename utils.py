@@ -1,30 +1,42 @@
 import os
 from openai import OpenAI
 
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-
 def ai_generate(tool, text):
-    if not text.strip():
-        return "Please enter some text."
+    try:
+        api_key = os.environ.get("OPENAI_API_KEY")
 
-    if tool == "writer":
-        prompt = f"Write a detailed essay about: {text}"
+        if not api_key:
+            return "❌ AI is not configured. API key missing."
 
-    elif tool == "rewriter":
-        prompt = f"Rewrite the following text professionally:\n{text}"
+        if not text.strip():
+            return "Please enter some text."
 
-    elif tool == "summarizer":
-        prompt = f"Summarize the following text clearly:\n{text}"
+        client = OpenAI(api_key=api_key)
 
-    else:
-        return "Unknown tool."
+        if tool == "writer":
+            prompt = f"Write a detailed, high-quality essay about:\n{text}"
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful AI writing assistant."},
-            {"role": "user", "content": prompt}
-        ]
-    )
+        elif tool == "rewriter":
+            prompt = f"Rewrite the following text professionally:\n{text}"
 
-    return response.choices[0].message.content
+        elif tool == "summarizer":
+            prompt = f"Summarize the following text clearly and concisely:\n{text}"
+
+        else:
+            return "Unknown tool."
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a professional AI writing assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=800
+        )
+
+        return response.choices[0].message.content
+
+    except Exception as e:
+        # IMPORTANT: Never crash Flask
+        return f"⚠️ AI Error: {str(e)}"
