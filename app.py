@@ -57,8 +57,15 @@ def register():
         password = generate_password_hash(request.form['password'])
         if User.query.filter_by(username=username).first():
             return "Username already exists"
-        db.session.add(User(username=username, password=password))
+
+        # Add to database
+        new_user = User(username=username, password=password)
+        db.session.add(new_user)
         db.session.commit()
+
+        # Add to JSON
+        save_user_to_json(new_user.id, username, password)
+
         return redirect(url_for('login'))
     return render_template('register.html')
 
