@@ -13,6 +13,31 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+USERS_FILE = 'users.json'
+
+def save_user_to_json(user_id, username, password):
+    try:
+        if not os.path.exists(USERS_FILE):
+            data = []
+        else:
+            with open(USERS_FILE, 'r') as f:
+                data = json.load(f)
+        data.append({"id": user_id, "username": username, "password": password})
+        with open(USERS_FILE, 'w') as f:
+            json.dump(data, f, indent=4)
+    except Exception as e:
+        print("Error saving user to JSON:", e)
+
+def load_users_from_json():
+    try:
+        if not os.path.exists(USERS_FILE):
+            return []
+        with open(USERS_FILE, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print("Error loading users:", e)
+        return []
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
